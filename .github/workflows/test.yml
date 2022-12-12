@@ -99,11 +99,17 @@ jobs:
           ' > hello.cpp
       - name: Compile
         run: g++ -o hello hello.cpp
+
+      - run: ./hello
+        shell: bash
+        name: Run hello on Git bash
+        id: hello-bash
+
       - run: hello
         shell: cmd
         name: Run hello on cmd
-        id: hello
+        id: hello-cmd
         continue-on-error: true
 
       - name: Test error
-        run: test "${{steps.hello.outcome}}" = "failure"
+        run: test "${{steps.hello-cmd.outcome}}" = "failure"
