@@ -7,7 +7,7 @@ description: Fix MinGW
 runs:
   using: composite
   steps:
-    - name: Remove from path
+    - name: Add to beginning of PATH
       shell: pwsh
       run: |
         [regex]::Matches($env:PATH, "[^;]+mingw[^;]+") | % Value >> $env:GITHUB_PATH
