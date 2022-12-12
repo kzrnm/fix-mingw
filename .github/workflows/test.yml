@@ -11,10 +11,8 @@ jobs:
   test:
     strategy:
       matrix:
-        shell: [cmd]
-        os: [windows-latest]
-        # shell: [bash, pwsh, cmd]
-        # os: [windows-2022, windows-latest]
+        shell: [bash, pwsh, cmd]
+        os: [windows-2022, windows-latest]
     runs-on: "${{ matrix.os }}"
     name: "Test: ${{ matrix.os }}-${{ matrix.shell }}"
     steps:
