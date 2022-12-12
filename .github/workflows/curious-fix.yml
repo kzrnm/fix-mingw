@@ -1,0 +1,48 @@
+name: Curious fix
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: windows-latest
+    steps:
+      - name: Fix
+        shell: bash
+        run: |
+          mkdir bin
+          cp C:/Program\ Files/Git/mingw64/bin/lib*.dll bin/
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - name: echo info
+        shell: pwsh
+        run: |
+          $gccExe = ((Get-Command gcc).Source)
+          echo "gcc: $gccExe"
+          echo "---- $PATH ----"
+          echo $env:PATH
+          echo "---------------"
+          Get-Item $gccExe
+          Get-ChildItem "$gccExe\.."
+          gcc -v
+      - name: Crete file
+        shell: pwsh
+        run: |
+          '
+          #include <cstdio>
+          #include <vector>
+
+          using namespace std;
+
+          int main(int, char* argv[]) {
+              vector<int> a(4);
+              printf("%d\n", a.size());
+              return 0;
+          }
+          ' > hello.cpp
+      - name: Compile
+        run: g++ -o hello hello.cpp
+      - run: hello
+        shell: cmd
+        name: Run hello on cmd
+        id: hello
