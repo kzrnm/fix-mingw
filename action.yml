@@ -1,0 +1,17 @@
+name: Fix MinGW
+description: Fix MinGW 
+
+# inputs:
+# outputs:
+
+runs:
+  using: composite
+  steps:
+    - name: Remove from path
+      shell: pwsh
+      run: |
+        [regex]::Matches($env:PATH, "[^;]+mingw[^;]+") | % Value >> $env:GITHUB_PATH
+
+branding:
+  icon: alert-circle
+  color: green

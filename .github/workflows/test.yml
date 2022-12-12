@@ -11,16 +11,28 @@ jobs:
   test:
     strategy:
       matrix:
-        shell: [bash, pwsh, cmd]
-        os: [windows-2022, windows-latest]
+        shell: [cmd]
+        os: [windows-latest]
+        # shell: [bash, pwsh, cmd]
+        # os: [windows-2022, windows-latest]
     runs-on: "${{ matrix.os }}"
     name: "Test: ${{ matrix.os }}-${{ matrix.shell }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: g++ version
-        run: g++ -v
+      - uses: ./
+
+      - name: echo info
+        shell: pwsh
+        run: |
+          $gccExe = ((Get-Command gcc).Source)
+          echo "gcc: $gccExe"
+          echo "---- `$PATH ----"
+          echo $env:PATH
+          echo "---------------"
+          Get-ChildItem "$gccExe\.."
+          gcc -v
       - name: Crete file
         shell: pwsh
         run: |
@@ -51,3 +63,49 @@ jobs:
         shell: cmd
         name: Run hello on cmd
         if: matrix.shell == 'cmd'
+
+  fail:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # No fix
+      # - uses: ./
+
+      - name: echo info
+        shell: pwsh
+        run: |
+          $gccExe = ((Get-Command gcc).Source)
+          echo "gcc: $gccExe"
+          echo "---- $PATH ----"
+          echo $env:PATH
+          echo "---------------"
+          Get-Item $gccExe
+          Get-ChildItem "$gccExe\.."
+          gcc -v
+      - name: Crete file
+        shell: pwsh
+        run: |
+          '
+          #include <cstdio>
+          #include <vector>
+
+          using namespace std;
+
+          int main(int, char* argv[]) {
+              vector<int> a(4);
+              printf("%d\n", a.size());
+              return 0;
+          }
+          ' > hello.cpp
+      - name: Compile
+        run: g++ -o hello hello.cpp
+      - run: hello
+        shell: cmd
+        name: Run hello on cmd
+        id: hello
+        continue-on-error: true
+
+      - name: Test error
+        run: test "${{steps.hello.outcome}}" = "failure"
