@@ -1,0 +1,53 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        shell: [bash, pwsh, cmd]
+        os: [windows-2022, windows-latest]
+    runs-on: "${{ matrix.os }}"
+    name: "Test: ${{ matrix.os }}-${{ matrix.shell }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: g++ version
+        run: g++ -v
+      - name: Crete file
+        shell: pwsh
+        run: |
+          '
+          #include <cstdio>
+          #include <vector>
+
+          using namespace std;
+
+          int main(int, char* argv[]) {
+              vector<int> a(4);
+              printf("%d\n", a.size());
+              return 0;
+          }
+          ' > hello.cpp
+      - name: Compile
+        run: g++ -o hello hello.cpp
+
+      - run: ./hello
+        shell: pwsh
+        name: Run hello on pwsh
+        if: matrix.shell == 'pwsh'
+      - run: ./hello
+        shell: bash
+        name: Run hello on bash
+        if: matrix.shell == 'bash'
+      - run: hello
+        shell: cmd
+        name: Run hello on cmd
+        if: matrix.shell == 'cmd'
