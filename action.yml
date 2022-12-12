@@ -9,6 +9,7 @@ runs:
   steps:
     - name: Add to beginning of PATH
       shell: pwsh
+      if: runner.os == 'Windows'
       run: |
         [regex]::Matches($env:PATH, "[^;]+mingw[^;]+") | % Value >> $env:GITHUB_PATH
 
