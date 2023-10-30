@@ -1,0 +1,25 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: windows-latest
+    steps:
+        shell: pwsh
+        run: |
+          '
+          #include <cstdio>
+          #include <vector>
+          using namespace std;
+          int main(int, char* argv[]) {
+              vector<int> a(4);
+              printf("%d\n", a.size());
+              return 0;
+          }
+          ' > hello.cpp
+      - name: Compile
+        run: g++ -o hello hello.cpp
+      - run: hello
+        shell: cmd
+        name: Run hello on cmd
+        id: hello
